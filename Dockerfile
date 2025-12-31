@@ -8,7 +8,7 @@ WORKDIR /app/src
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src/ ./src/
+COPY src/ ./
 # Copy static assets (icons, etc.) for Flask static serving
 COPY src/static/ ./src/static/
 COPY entrypoint.sh .
