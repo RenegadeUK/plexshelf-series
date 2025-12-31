@@ -15,8 +15,10 @@ RUN chmod +x entrypoint.sh
 # Create config and data directories
 RUN mkdir -p /config /data
 
+
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app/src
 
 # Expose web UI port
 EXPOSE 8080
