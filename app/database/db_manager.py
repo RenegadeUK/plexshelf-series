@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class DatabaseManager:
     """Manages database connections and sessions"""
     
-    def __init__(self, db_path="/data/plexshelf.db"):
+    def __init__(self, db_path="/config/plexshelf.db"):
         """Initialize database manager"""
         self.db_path = db_path
         self.engine = None
