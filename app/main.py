@@ -6,8 +6,8 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(__file__))
 import logging
-from src.web_app import app
-from src.utils.logger import setup_logger
+from web_app import app
+from utils.logger import setup_logger
 
 # Setup logging
 logger = setup_logger()
