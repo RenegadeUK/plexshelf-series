@@ -32,8 +32,8 @@ ENV/
 .DS_Store
 
 # Application data
-config/
-data/
+/config/
+/data/
 *.db
 *.sqlite
 *.sqlite3
