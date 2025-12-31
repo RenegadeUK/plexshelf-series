@@ -4,11 +4,11 @@ Web UI for PlexShelf Series Manager using Flask
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask import send_from_directory
 import logging
-from database.db_manager import DatabaseManager
-from config.config_manager import ConfigManager
-from plex.plex_client import PlexClient
-from matching.series_matcher import SeriesMatcher
-from database.models import AudiobookItem, Series, SeriesMatch, PlexCollection
+from src.database.db_manager import DatabaseManager
+from src.config.config_manager import ConfigManager
+from src.plex.plex_client import PlexClient
+from src.matching.series_matcher import SeriesMatcher
+from src.database.models import AudiobookItem, Series, SeriesMatch, PlexCollection
 
 logger = logging.getLogger(__name__)
 
