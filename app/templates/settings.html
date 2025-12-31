@@ -1,8 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Settings - PlexShelf</title>
-    <style>
+{% extends "base.html" %}
+{% block title %}Settings - PlexShelf{% endblock %}
+{% block styles %}
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; padding: 20px; }
         .container { max-width: 800px; margin: 0 auto; }
@@ -20,9 +18,8 @@
         .status.success { background: #2d5016; border-left: 4px solid #4caf50; }
         .status.error { background: #5c1a1a; border-left: 4px solid #f44336; }
         .help { color: #666; font-size: 12px; margin-top: 5px; }
-    </style>
-</head>
-<body>
+{% endblock %}
+{% block body %}
     <div class="container">
         <h1>Settings</h1>
         
@@ -98,7 +95,8 @@
             </div>
         </div>
     </div>
-    
+{% endblock %}
+{% block scripts %}
     <script>
         // Clear database with confirmation
         async function clearDatabase() {
@@ -185,5 +183,4 @@
             }
         });
     </script>
-</body>
-</html>
+{% endblock %}

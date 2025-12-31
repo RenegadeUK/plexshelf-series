@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>PlexShelf Series Manager</title>
-    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-    <link rel="icon" type="image/png" sizes="256x256" href="/static/icon-256.png">
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-    <style>
+{% extends "base.html" %}
+{% block title %}PlexShelf Series Manager{% endblock %}
+{% block styles %}
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; padding: 20px; }
         .container { max-width: 1200px; margin: 0 auto; }
@@ -41,9 +36,8 @@
         .activity-log .log-entry.error { border-left-color: #f44336; }
         .activity-log .log-time { color: #888; margin-right: 10px; }
         .activity-log .log-message { color: #ddd; }
-    </style>
-</head>
-<body>
+{% endblock %}
+{% block body %}
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <div class="spinner"></div>
@@ -107,7 +101,8 @@
             </div>
         </div>
     </div>
-    
+{% endblock %}
+{% block scripts %}
     <script>
         function addLogEntry(message, type = 'info') {
             const logContent = document.getElementById('activityLogContent');
@@ -221,5 +216,4 @@
             }
         }
     </script>
-</body>
-</html>
+{% endblock %}

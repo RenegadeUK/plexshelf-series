@@ -1,8 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Review Matches - PlexShelf</title>
-    <style>
+{% extends "base.html" %}
+{% block title %}Review Matches - PlexShelf{% endblock %}
+{% block styles %}
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; padding: 20px; }
         .container { max-width: 1400px; margin: 0 auto; }
@@ -28,9 +26,8 @@
         .confidence.high { color: #4caf50; }
         .confidence.medium { color: #ff9800; }
         .confidence.low { color: #f44336; }
-    </style>
-</head>
-<body>
+{% endblock %}
+{% block body %}
     <div class="container">
         <h1>Review Matches</h1>
         
@@ -101,7 +98,8 @@
         <p style="text-align: center; padding: 40px; color: #666;">No matches found.</p>
         {% endif %}
     </div>
-    
+{% endblock %}
+{% block scripts %}
     <script>
         async function approveAll() {
             if (!confirm('Approve all pending matches?')) return;
@@ -157,5 +155,4 @@
             }
         }
     </script>
-</body>
-</html>
+{% endblock %}

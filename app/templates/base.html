@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}PlexShelf{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="icon" type="image/png" sizes="256x256" href="/static/icon-256.png">
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    {% block head %}{% endblock %}
+    <style>
+        {% block styles %}{% endblock %}
+    </style>
+</head>
+<body>
+    {% block body %}{% endblock %}
+    {% block scripts %}{% endblock %}
+</body>
+</html>
