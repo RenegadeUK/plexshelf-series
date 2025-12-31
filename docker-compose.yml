@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  plexshelf-series:
+    build: .
+    container_name: plexshelf-series
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=UTC
+    volumes:
+      - ./config:/config
+      - ./data:/data
+    ports:
+      - "8080:8080"  # Web UI port
+    networks:
+      - plexshelf-network
+
+networks:
+  plexshelf-network:
+    driver: bridge

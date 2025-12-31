@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Settings - PlexShelf</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { margin-bottom: 30px; color: #e5a00d; }
+        nav { margin-bottom: 30px; }
+        nav a { color: #e5a00d; text-decoration: none; margin-right: 20px; font-weight: bold; }
+        nav a:hover { text-decoration: underline; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #888; font-weight: bold; }
+        input { width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; font-size: 14px; }
+        input:focus { outline: none; border-color: #e5a00d; }
+        button { background: #e5a00d; color: #000; border: none; padding: 15px 25px; border-radius: 5px; font-size: 16px; cursor: pointer; font-weight: bold; margin-right: 10px; }
+        button:hover { background: #cc8f0c; }
+        .status { padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none; }
+        .status.success { background: #2d5016; border-left: 4px solid #4caf50; }
+        .status.error { background: #5c1a1a; border-left: 4px solid #f44336; }
+        .help { color: #666; font-size: 12px; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Settings</h1>
+        
+        <nav>
+            <a href="/">Home</a>
+            <a href="/matches">Review Matches</a>
+            <a href="/settings">Settings</a>
+        </nav>
+        
+        <div id="message" class="status"></div>
+        
+        <form id="settingsForm">
+            <div class="form-group">
+                <label for="plex_url">Plex Server URL</label>
+                <input type="text" id="plex_url" name="plex_url" value="{{ config.plex_url }}" placeholder="http://192.168.1.100:32400" required>
+                <div class="help">Example: http://192.168.1.100:32400</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="plex_token">Plex Token</label>
+                <input type="password" id="plex_token" name="plex_token" placeholder="{% if config.token_set %}✓ Token Set (leave blank to keep existing){% else %}Enter your Plex token{% endif %}">
+                <div class="help">Find your token: Settings → Account → "Get Token"{% if config.token_set %} | Leave blank to keep current token{% endif %}</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="library_name">Library Name</label>
+                <input type="text" id="library_name" name="library_name" value="{{ config.library_name }}" placeholder="Audiobooks">
+            </div>
+            
+            <h2 style="margin-top: 30px; margin-bottom: 20px; color: #e5a00d;">External API Settings</h2>
+            
+            <div class="form-group">
+                <label for="external_api_enabled">
+                    <input type="checkbox" id="external_api_enabled" name="external_api_enabled" {% if config.external_api_enabled %}checked{% endif %} style="width: auto; margin-right: 10px;">
+                    Enable External Series Lookup
+                </label>
+                <div class="help">Use AI to identify series information (recommended for best results)</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="external_api_provider">API Provider</label>
+                <select id="external_api_provider" name="external_api_provider" style="width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px;">
+                    <option value="openai" {% if config.external_api_provider == 'openai' %}selected{% endif %}>OpenAI (Recommended)</option>
+                    <option value="google_books" {% if config.external_api_provider == 'google_books' %}selected{% endif %}>Google Books</option>
+                </select>
+            </div>
+            
+            <div class="form-group" id="openai_key_group">
+                <label for="openai_api_key">OpenAI API Key</label>
+                <input type="password" id="openai_api_key" name="openai_api_key" placeholder="{% if config.api_key_set %}✓ API Key Set (leave blank to keep existing){% else %}sk-...{% endif %}">
+                <div class="help">Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank" style="color: #e5a00d;">platform.openai.com</a>{% if config.api_key_set %} | Leave blank to keep current key{% endif %}</div>
+            </div>
+            
+            <div class="form-group" id="openai_model_group">
+                <label for="openai_model">OpenAI Model</label>
+                <input type="text" id="openai_model" name="openai_model" value="{{ config.openai_model or 'gpt-4o-mini' }}" placeholder="gpt-4o-mini">
+                <div class="help">Recommended: gpt-4o-mini (fast and affordable)</div>
+            </div>
+            
+            <button type="submit">Save & Connect</button>
+            <button type="button" onclick="window.location.href='/'">Cancel</button>
+        </form>
+        
+        <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid #444;">
+            <h2 style="color: #d32f2f; margin-bottom: 15px;">Danger Zone</h2>
+            <p style="color: #888; margin-bottom: 15px;">Warning: This action cannot be undone!</p>
+            <button onclick="clearDatabase()" style="background: #d32f2f; color: white;">
+                Clear Database
+            </button>
+            <div style="color: #666; font-size: 12px; margin-top: 10px;">
+                This will remove all scanned audiobooks, series, and matches from the database.
+                Your Plex library will not be affected.
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Clear database with confirmation
+        async function clearDatabase() {
+            if (!confirm('Are you sure you want to clear the entire database?\n\nThis will remove:\n- All scanned audiobooks\n- All series data\n- All matches\n\nThis action CANNOT be undone!')) {
+                return;
+            }
+            
+            if (!confirm('Last chance! Are you REALLY sure?\n\nYou will need to scan your library again.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/clear-database', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                const msgDiv = document.getElementById('message');
+                
+                if (data.success) {
+                    msgDiv.className = 'status success';
+                    msgDiv.textContent = data.message + ' - Redirecting...';
+                    msgDiv.style.display = 'block';
+                    setTimeout(() => window.location.href = '/', 2000);
+                } else {
+                    msgDiv.className = 'status error';
+                    msgDiv.textContent = 'Error: ' + data.message;
+                    msgDiv.style.display = 'block';
+                }
+            } catch (error) {
+                const msgDiv = document.getElementById('message');
+                msgDiv.className = 'status error';
+                msgDiv.textContent = 'Error: ' + error.message;
+                msgDiv.style.display = 'block';
+            }
+        }
+        // Show/hide OpenAI fields based on provider selection
+        function toggleOpenAIFields() {
+            const provider = document.getElementById('external_api_provider').value;
+            const keyGroup = document.getElementById('openai_key_group');
+            const modelGroup = document.getElementById('openai_model_group');
+            
+            if (provider === 'openai') {
+                keyGroup.style.display = 'block';
+                modelGroup.style.display = 'block';
+            } else {
+                keyGroup.style.display = 'none';
+                modelGroup.style.display = 'none';
+            }
+        }
+        
+        document.getElementById('external_api_provider').addEventListener('change', toggleOpenAIFields);
+        toggleOpenAIFields(); // Initialize on load
+        
+        document.getElementById('settingsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/settings', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                const msgDiv = document.getElementById('message');
+                
+                if (data.success) {
+                    msgDiv.className = 'status success';
+                    msgDiv.textContent = data.message;
+                    msgDiv.style.display = 'block';
+                    setTimeout(() => window.location.href = '/', 2000);
+                } else {
+                    msgDiv.className = 'status error';
+                    msgDiv.textContent = data.message;
+                    msgDiv.style.display = 'block';
+                }
+            } catch (e) {
+                const msgDiv = document.getElementById('message');
+                msgDiv.className = 'status error';
+                msgDiv.textContent = 'Connection failed: ' + e.message;
+                msgDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

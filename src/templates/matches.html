@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Review Matches - PlexShelf</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { margin-bottom: 30px; color: #e5a00d; }
+        nav { margin-bottom: 30px; }
+        nav a { color: #e5a00d; text-decoration: none; margin-right: 20px; font-weight: bold; }
+        nav a:hover { text-decoration: underline; }
+        .controls { margin-bottom: 20px; display: flex; gap: 10px; align-items: center; }
+        select { background: #2a2a2a; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 5px; font-size: 14px; }
+        button { background: #e5a00d; color: #000; border: none; padding: 10px 20px; border-radius: 5px; font-size: 14px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #cc8f0c; }
+        button.reject { background: #f44336; color: #fff; }
+        button.reject:hover { background: #d32f2f; }
+        table { width: 100%; border-collapse: collapse; background: #2a2a2a; border-radius: 8px; overflow: hidden; }
+        th { background: #333; padding: 15px; text-align: left; font-weight: bold; color: #e5a00d; }
+        td { padding: 15px; border-top: 1px solid #444; }
+        tr:hover { background: #333; }
+        .status { padding: 5px 10px; border-radius: 3px; font-size: 12px; font-weight: bold; }
+        .status.pending { background: #1a3a5c; color: #2196f3; }
+        .status.approved { background: #2d5016; color: #4caf50; }
+        .status.rejected { background: #5c1a1a; color: #f44336; }
+        .confidence { font-weight: bold; }
+        .confidence.high { color: #4caf50; }
+        .confidence.medium { color: #ff9800; }
+        .confidence.low { color: #f44336; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Review Matches</h1>
+        
+        <nav>
+            <a href="/">Home</a>
+            <a href="/matches">Review Matches</a>
+            <a href="/settings">Settings</a>
+        </nav>
+        
+        <div class="controls">
+            <label>Filter:</label>
+            <select onchange="window.location.href='/matches?filter=' + this.value">
+                <option value="all" {{ 'selected' if filter == 'all' else '' }}>All</option>
+                <option value="pending" {{ 'selected' if filter == 'pending' else '' }}>Pending</option>
+                <option value="approved" {{ 'selected' if filter == 'approved' else '' }}>Approved</option>
+                <option value="rejected" {{ 'selected' if filter == 'rejected' else '' }}>Rejected</option>
+            </select>
+            
+            <button onclick="approveAll()" style="margin-left: 20px;">Approve All Pending</button>
+            <button onclick="rejectAll()" class="reject">Reject All Pending</button>
+        </div>
+        
+        {% if matches %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Audiobook</th>
+                    <th>Author</th>
+                    <th>Series</th>
+                    <th>Book #</th>
+                    <th>Confidence</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for match in matches %}
+                <tr>
+                    <td>{{ match.audiobook_title }}</td>
+                    <td>{{ match.audiobook_author }}</td>
+                    <td>{{ match.series_name }}</td>
+                    <td style="text-align: center; font-weight: bold; {% if match.series_index == 'Companion' %}color: #888; font-style: italic;{% else %}color: #e5a00d;{% endif %}">{{ match.series_index }}</td>
+                    <td>
+                        <span class="confidence {{ 'high' if match.confidence_score >= 85 else 'medium' if match.confidence_score >= 70 else 'low' }}">
+                            {{ match.confidence_score }}%
+                        </span>
+                    </td>
+                    <td>{{ match.match_method }}</td>
+                    <td>
+                        <span class="status {{ 'approved' if match.user_approved else 'rejected' if match.user_rejected else 'pending' }}">
+                            {{ 'Approved' if match.user_approved else 'Rejected' if match.user_rejected else 'Pending' }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if not match.user_approved %}
+                        <button onclick="approveMatch({{ match.id }})">Approve</button>
+                        {% endif %}
+                        {% if not match.user_rejected %}
+                        <button class="reject" onclick="rejectMatch({{ match.id }})">Reject</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="text-align: center; padding: 40px; color: #666;">No matches found.</p>
+        {% endif %}
+    </div>
+    
+    <script>
+        async function approveAll() {
+            if (!confirm('Approve all pending matches?')) return;
+            
+            try {
+                const response = await fetch('/matches/approve-all', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
+        
+        async function rejectAll() {
+            if (!confirm('Reject all pending matches?')) return;
+            
+            try {
+                const response = await fetch('/matches/reject-all', { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
+            }
+        }
+        
+        async function approveMatch(id) {
+            try {
+                await fetch('/matches/' + id + '/approve', { method: 'POST' });
+                location.reload();
+            } catch (e) {
+                alert('Failed to approve: ' + e.message);
+            }
+        }
+        
+        async function rejectMatch(id) {
+            try {
+                await fetch('/matches/' + id + '/reject', { method: 'POST' });
+                location.reload();
+            } catch (e) {
+                alert('Failed to reject: ' + e.message);
+            }
+        }
+    </script>
+</body>
+</html>
