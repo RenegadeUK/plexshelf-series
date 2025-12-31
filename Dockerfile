@@ -1,7 +1,8 @@
 FROM python:3.11-slim
 
-# Set working directory
-WORKDIR /app
+
+# Set working directory to /app/src for correct module imports
+WORKDIR /app/src
 
 # Copy requirements first for better caching
 COPY requirements.txt .
@@ -22,5 +23,6 @@ ENV PYTHONUNBUFFERED=1
 # Expose web UI port
 EXPOSE 8080
 
-# Set entrypoint
-CMD ["python", "src/main.py"]
+
+# Set entrypoint to run from /app/src
+CMD ["python", "main.py"]

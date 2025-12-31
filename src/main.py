@@ -3,6 +3,8 @@ PlexShelf Series Manager
 Main entry point for the web application
 """
 import sys
+import os
+sys.path.insert(0, os.path.dirname(__file__))
 import logging
 from web_app import app
 from utils.logger import setup_logger
