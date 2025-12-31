@@ -28,8 +28,8 @@ docker-compose.yml
 Dockerfile
 
 # Data and config (will be mounted as volumes)
-config/
-data/
+/config/
+/data/
 
 # Documentation
 README.md
